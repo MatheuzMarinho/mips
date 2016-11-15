@@ -1,0 +1,46 @@
+$s0-> Base de dados
+$s1 -> Cont de Equipametos ( 0 (Bom) -  4(Defeito))
+$s2 -> Total de equipamentos
+
+relatorio:
+
+addi $t3,$zero,110 # add em t1=110
+add $t4,$zero,$zero # t4 =0 = cont
+
+while:	
+	slt $t1,$t4,$a2 # se cont<total ->1
+	beq $t1,$zero,exit_proc # se cont>total -> exit	
+	lw $t0,0($a0) # ler a base de dados
+	slti $t1,$t0,127 # se t0<127
+	beq $t1,$zero,defeituosa # se t0>217 cont defeituosa
+	slt $t1,$t3,$t0 # se t3<t0 =>1
+	beq $t1,$zero,defeituosa # Se t0<110 defeituosa
+	lw $t0,4($a0) # anda vet pega corrente
+	slti $t1,$t0,1 # se t0 <1 ->1
+	bne $t1,$zero,perfeita # se t0<1
+	slti $t1,$t0,2 # t0<2 -> 1
+	beq $t1,$zero,perfeita # se t1>2
+defeituosa:
+	lw $t5,4($a1) # carrega o valor das defeituosas
+	addi $t5,$t5,1 #cont++
+	sw $t5,4($a1) # carrega o cont nas defeituosas
+	j fim_while
+
+perfeita:
+	lw $t5,0($a1) # carrega o valor das perfeitas
+	addi $t5,$t5,1 #cont++
+	sw $t5,0($a1) # carrega o cont nas perfeitas
+		
+fim_while: 
+	addi $a0,$a0,8 # anda o vetor em 8
+	j while
+
+exit_proc:
+	jr $ra
+
+main:
+
+add $a0,$s0,$zero # add -> carrega em a0 -> base de dados
+add $a1,$s1,$zero # carrega em a1 o vetor de cont
+add $a2,$s2,$zero # carrega em a2 o total
+jal relatorio
